@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects | Alex Morgan - Creative Developer</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* Projects page specific styles */
+    .projects-hero {
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .projects-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.3;
+    }
+    
+    .projects-hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+    }
+    
+    .projects-hero h1 {
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: var(--space-lg);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .projects-hero p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: var(--space-xl);
+    }
+    
+    .breadcrumb {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-lg);
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-full);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all var(--duration-normal) var(--ease-out);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .breadcrumb:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      color: var(--primary);
+    }
+    
+    .projects-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--space-lg);
+      margin-top: var(--space-2xl);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: var(--space-lg);
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+    
+    .stat-item:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: var(--space-xs);
+      font-family: var(--font-mono);
+    }
+    
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    
+    .projects-main {
+      padding: var(--space-3xl) 0;
+    }
+    
+    .projects-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 var(--space-lg);
+    }
+    
+    .filter-section {
+      margin-bottom: var(--space-3xl);
+    }
+    
+    .filter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-xl);
+      flex-wrap: wrap;
+      gap: var(--space-md);
+    }
+    
+    .results-count {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    
+    .sort-select {
+      padding: var(--space-sm) var(--space-md);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+    
+    .sort-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(var(--primary), 0.1);
+    }
+    
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: var(--space-xl);
+      margin-bottom: var(--space-3xl);
+    }
+    
+    .project-card {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      transition: all var(--duration-normal) var(--ease-out);
+      cursor: pointer;
+      height: fit-content;
+    }
+    
+    .project-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-2xl);
+      border-color: var(--primary);
+    }
+    
+    .project-image {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 16/10;
+    }
+    
+    .project-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--duration-slow) var(--ease-out);
+    }
+    
+    .project-card:hover .project-image img {
+      transform: scale(1.05);
+    }
+    
+    .project-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(6, 182, 212, 0.8));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity var(--duration-normal) var(--ease-out);
+    }
+    
+    .project-card:hover .project-overlay {
+      opacity: 1;
+    }
+    
+    .project-links {
+      display: flex;
+      gap: var(--space-md);
+    }
+    
+    .project-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 50%;
+      color: white;
+      text-decoration: none;
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+    
+    .project-link:hover {
+      background: white;
+      color: var(--primary);
+      transform: scale(1.1);
+    }
+    
+    .project-content {
+      padding: var(--space-xl);
+    }
+    
+    .project-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-md);
+    }
+    
+    .project-category {
+      font-size: 0.875rem;
+      color: var(--primary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .project-date {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    
+    .project-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: var(--space-md);
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+    
+    .project-description {
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: var(--space-lg);
+    }
+    
+    .project-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .tech-tag {
+      padding: var(--space-xs) var(--space-sm);
+      background: rgba(var(--primary), 0.1);
+      color: var(--primary);
+      border-radius: var(--radius-md);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .project-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--border-light);
+    }
+    
+    .project-status {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .status-completed .status-dot {
+      background: #10b981;
+    }
+    
+    .status-ongoing .status-dot {
+      background: #f59e0b;
+      animation: pulse 2s infinite;
+    }
+    
+    .status-concept .status-dot {
+      background: #8b5cf6;
+    }
+    
+    .view-project {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+    
+    .view-project:hover {
+      gap: var(--space-sm);
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-md);
+      margin-top: var(--space-3xl);
+    }
+    
+    .pagination-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+    
+    .pagination-btn:hover,
+    .pagination-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .pagination-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .pagination-btn.disabled:hover {
+      transform: none;
+      background: var(--bg-secondary);
+      color: var(--text-muted);
+      border-color: var(--border-light);
+    }
+    
+    @media (max-width: 768px) {
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .filter-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .projects-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .projects-hero h1 {
+        font-size: 2.5rem;
+      }
+      
+      .projects-stats {
+        grid-template-columns: 1fr;
+      }
+      
+      .project-content {
+        padding: var(--space-lg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Custom Cursor -->
+  <div class="custom-cursor">
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+  </div>
+
+  <!-- Background Elements -->
+  <div class="background-canvas">
+    <canvas id="particle-canvas"></canvas>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+    <div class="noise-overlay"></div>
+  </div>
+
+  <!-- Theme Toggle -->
+  <div class="theme-toggle">
+    <button id="theme-button" aria-label="Toggle theme">
+      <div class="toggle-track">
+        <div class="toggle-thumb">
+          <i class="fas fa-sun sun-icon"></i>
+          <i class="fas fa-moon moon-icon"></i>
+        </div>
+      </div>
+    </button>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-blur"></div>
+    <div class="nav-container">
+      <div class="logo">
+        <div class="logo-wrapper">
+          <span class="logo-text">AM</span>
+          <div class="logo-dot"></div>
+        </div>
+      </div>
+      <div class="mobile-menu-btn">
+        <span class="line line-1"></span>
+        <span class="line line-2"></span>
+        <span class="line line-3"></span>
+      </div>
+      <div class="menu-container">
+        <ul class="menu">
+          <li><a href="index.html#home">Home</a></li>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#skills">Skills</a></li>
+          <li class="active"><a href="projects.html">Projects</a></li>
+          <li><a href="index.html#experience">Experience</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="nav-cta">
+        <a href="index.html#contact" class="glass-button">
+          <span>Let's Talk</span>
+          <div class="button-glow"></div>
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div class="menu-overlay"></div>
+
+  <!-- Projects Hero -->
+  <section class="projects-hero">
+    <div class="projects-hero-content">
+      <a href="index.html" class="breadcrumb magnetic">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Home</span>
+      </a>
+      <h1>My Projects</h1>
+      <p>
+        Explore my complete portfolio of projects spanning web development, 
+        mobile applications, and innovative digital solutions. Each project 
+        represents a unique challenge and creative solution.
+      </p>
+      <div class="projects-stats">
+        <div class="stat-item">
+          <div class="stat-number" data-count="25">0</div>
+          <div class="stat-label">Projects</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-count="15">0</div>
+          <div class="stat-label">Clients</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" data-count="3">0</div>
+          <div class="stat-label">Years</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Main -->
+  <main class="projects-main">
+    <div class="projects-container">
+      <!-- Filter Section -->
+      <div class="filter-section">
+        <div class="filter-header">
+          <div class="results-count">
+            <span id="results-count">25</span> projects found
+          </div>
+          <select class="sort-select" id="sort-select">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="name">Name A-Z</option>
+            <option value="category">Category</option>
+          </select>
+        </div>
+        
+        <div class="projects-filter">
+          <button class="filter-btn active magnetic" data-filter="all">All Projects</button>
+          <button class="filter-btn magnetic" data-filter="web">Web Applications</button>
+          <button class="filter-btn magnetic" data-filter="mobile">Mobile Apps</button>
+          <button class="filter-btn magnetic" data-filter="design">UI/UX Design</button>
+          <button class="filter-btn magnetic" data-filter="experimental">Experimental</button>
+        </div>
+      </div>
+
+      <!-- Projects Grid -->
+      <div class="projects-grid" id="projects-grid">
+        <!-- Project 1 -->
+        <article class="project-card magnetic" data-category="web" data-date="2024-01">
+          <div class="project-image">
+            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=500&fit=crop" alt="E-commerce Platform">
+            <div class="project-overlay">
+              <div class="project-links">
+                <a href="#" class="project-link magnetic" aria-label="View Live Demo">
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+                <a href="#" class="project-link magnetic" aria-label="View Source Code">
+                  <i class="fab fa-github"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span class="project-category">Web Application</span>
+              <span class="project-date">Jan 2024</span>
+            </div>
+            <h3 class="project-title">E-commerce Platform</h3>
+            <p class="project-description">
+              A modern, scalable e-commerce solution featuring advanced product filtering, 
+              real-time inventory management, and seamless checkout experience with Stripe integration.
+            </p>
+            <div class="project-tech">
+              <span class="tech-tag">React</span>
+              <span class="tech-tag">Node.js</span>
+              <span class="tech-tag">PostgreSQL</span>
+              <span class="tech-tag">Stripe</span>
+              <span class="tech-tag">Redis</span>
+            </div>
+            <div class="project-footer">
+              <div class="project-status status-completed">
+                <div class="status-dot"></div>
+                <span>Completed</span>
+              </div>
+              <a href="#" class="view-project">
+                <span>View Details</span>
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Project 2 -->
+        <article class="project-card magnetic" data-category="mobile" data-date="2023-12">
+          <div class="project-image">
+            <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=500&fit=crop" alt="Task Management App">
+            <div class="project-overlay">
+              <div class="project-links">
+                <a href="#" class="project-link magnetic" aria-label="View App Store">
+                  <i class="fab fa-apple"></i>
+                </a>
+                <a href="#" class="project-link magnetic" aria-label="View Source Code">
+                  <i class="fab fa-github"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span class="project-category">Mobile App</span>
+              <span class="project-date">Dec 2023</span>
+            </div>
+            <h3 class="project-title">TaskFlow Pro</h3>
+            <p class="project-description">
+              AI-powered task management app with collaborative features, smart prioritization, 
+              and cross-platform synchronization for teams and individuals.
+            </p>
+            <div class="project-tech">
+              <span class="tech-tag">React Native</span>
+              <span class="tech-tag">Firebase</span>
+              <span class="tech-tag">Redux</span>
+              <span class="tech-tag">OpenAI API</span>
+            </div>
+            <div class="project-footer">
+              <div class="project-status status-completed">
+                <div class="status-dot"></div>
+                <span>Completed</span>
+              </div>
+              <a href="#" class="view-project">
+                <span>View Details</span>
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Project 3 -->
+        <article class="project-card magnetic" data-category="design" data-date="2023-11">
+          <div class="project-image">
+            <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?w=800&h=500&fit=crop" alt="Design System">
+            <div class="project-overlay">
+              <div class="project-links">
+                <a href="#" class="project-link magnetic" aria-label="View Figma">
+                  <i class="fab fa-figma"></i>
+                </a>
+                <a href="#" class="project-link magnetic" aria-label="View Storybook">
+                  <i class="fas fa-book"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span class="project-category">Design System</span>
+              <span class="project-date">Nov 2023</span>
+            </div>
+            <h3 class="project-title">Nova Design System</h3>
+            <p class="project-description">
+              Comprehensive design system with 100+ components, detailed documentation, 
+              and seamless Figma-to-code workflow for enterprise applications.
+            </p>
+            <div class="project-tech">
+              <span class="tech-tag">Figma</span>
+              <span class="tech-tag">Storybook</span>
+              <span class="tech-tag">React</span>
+              <span class="tech-tag">TypeScript</span>
+            </div>
+            <div class="project-footer">
+              <div class="project-status status-ongoing">
+                <div class="status-dot"></div>
+                <span>In Progress</span>
+              </div>
+              <a href="#" class="view-project">
+                <span>View Details</span>
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Project 4 -->
+        <article class="project-card magnetic" data-category="web" data-date="2023-10">
+          <div class="project-image">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=500&fit=crop" alt="Analytics Dashboard">
+            <div class="project-overlay">
+              <div class="project-links">
+                <a href="#" class="project-link magnetic" aria-label="View Live Demo">
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+                <a href="#" class="project-link magnetic" aria-label="View Source Code">
+                  <i class="fab fa-github"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span class="project-category">Web Application</span>
+              <span class="project-date">Oct 2023</span>
+            </div>
+            <h3 class="project-title">Analytics Dashboard</h3>
+            <p class="project-description">
+              Real-time analytics dashboard with interactive charts, custom reporting, 
+              and automated insights for business intelligence and data visualization.
+            </p>
+            <div class="project-tech">
+              <span class="tech-tag">Vue.js</span>
+              <span class="tech-tag">D3.js</span>
+              <span class="tech-tag">Python</span>
+              <span class="tech-tag">MongoDB</span>
+            </div>
+            <div class="project-footer">
+              <div class="project-status status-completed">
+                <div class="status-dot"></div>
+                <span>Completed</span>
+              </div>
+              <a href="#" class="view-project">
+                <span>View Details</span>
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Project 5 -->
+        <article class="project-card magnetic" data-category="experimental" data-date="2023-09">
+          <div class="project-image">
+            <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=500&fit=crop" alt="3D Portfolio">
+            <div class="project-overlay">
+              <div class="project-links">
+                <a href="#" class="project-link magnetic" aria-label="View Live Demo">
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+                <a href="#" class="project-link magnetic" aria-label="View Source Code">
+                  <i class="fab fa-github"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span class="project-category">Experimental</span>
+              <span class="project-date">Sep 2023</span>
+            </div>
+            <h3 class="project-title">3D Interactive Portfolio</h3>
+            <p class="project-description">
+              Immersive 3D portfolio experience using WebGL and Three.js, featuring 
+              interactive environments and physics-based animations.
+            </p>
+            <div class="project-tech">
+              <span class="tech-tag">Three.js</span>
+              <span class="tech-tag">WebGL</span>
+              <span class="tech-tag">GSAP</span>
+              <span class="tech-tag">Blender</span>
+            </div>
+            <div class="project-footer">
+              <div class="project-status status-concept">
+                <div class="status-dot"></div>
+                <span>Concept</span>
+              </div>
+              <a href="#" class="view-project">
+                <span>View Details</span>
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Project 6 -->
+        <article class="project-card magnetic" data-category="web" data-date="2023-08">
+          <div class="project-image">
+            <img src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&h=500&fit=crop" alt="Blog Platform">
+            <div class="project-overlay">
+              <div class="project-links">
+                <a href="#" class="project-link magnetic" aria-label="View Live Demo">
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+                <a href="#" class="project-link magnetic" aria-label="View Source Code">
+                  <i class="fab fa-github"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-meta">
+              <span class="project-category">Web Application</span>
+              <span class="project-date">Aug 2023</span>
+            </div>
+            <h3 class="project-title">DevBlog Platform</h3>
+            <p class="project-description">
+              Modern blogging platform for developers with markdown support, 
+              syntax highlighting, and community features for technical writing.
+            </p>
+            <div class="project-tech">
+              <span class="tech-tag">Next.js</span>
+              <span class="tech-tag">Sanity CMS</span>
+              <span class="tech-tag">Tailwind CSS</span>
+              <span class="tech-tag">Vercel</span>
+            </div>
+            <div class="project-footer">
+              <div class="project-status status-completed">
+                <div class="status-dot"></div>
+                <span>Completed</span>
+              </div>
+              <a href="#" class="view-project">
+                <span>View Details</span>
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <a href="#" class="pagination-btn disabled magnetic" aria-label="Previous page">
+          <i class="fas fa-chevron-left"></i>
+        </a>
+        <a href="#" class="pagination-btn active magnetic">1</a>
+        <a href="#" class="pagination-btn magnetic">2</a>
+        <a href="#" class="pagination-btn magnetic">3</a>
+        <a href="#" class="pagination-btn magnetic" aria-label="Next page">
+          <i class="fas fa-chevron-right"></i>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <div class="logo">
+            <span class="logo-text">AM</span>
+            <div class="logo-dot"></div>
+          </div>
+          <p>Creating digital experiences that inspire and engage users worldwide.</p>
+        </div>
+        <div class="footer-links">
+          <div class="link-group">
+            <h4>Quick Links</h4>
+            <a href="index.html#home">Home</a>
+            <a href="index.html#about">About</a>
+            <a href="projects.html">Projects</a>
+            <a href="index.html#contact">Contact</a>
+          </div>
+          <div class="link-group">
+            <h4>Services</h4>
+            <a href="#">Web Development</a>
+            <a href="#">UI/UX Design</a>
+            <a href="#">Mobile Apps</a>
+            <a href="#">Consulting</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Alex Morgan. All rights reserved.</p>
+        <div class="footer-social">
+          <a href="#" class="social-link magnetic">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="#" class="social-link magnetic">
+            <i class="fab fa-linkedin-in"></i>
+          </a>
+          <a href="#" class="social-link magnetic">
+            <i class="fab fa-github"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to Top -->
+  <button class="back-to-top magnetic">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script src="script.js"></script>
+  <script>
+    // Projects page specific functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      initProjectsPage();
+    });
+
+    function initProjectsPage() {
+      const sortSelect = document.getElementById('sort-select');
+      const resultsCount = document.getElementById('results-count');
+      const projectsGrid = document.getElementById('projects-grid');
+      
+      // Sort functionality
+      if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+          const sortValue = this.value;
+          const projects = Array.from(projectsGrid.children);
+          
+          projects.sort((a, b) => {
+            switch(sortValue) {
+              case 'newest':
+                return new Date(b.dataset.date) - new Date(a.dataset.date);
+              case 'oldest':
+                return new Date(a.dataset.date) - new Date(b.dataset.date);
+              case 'name':
+                return a.querySelector('.project-title').textContent.localeCompare(
+                  b.querySelector('.project-title').textContent
+                );
+              case 'category':
+                return a.dataset.category.localeCompare(b.dataset.category);
+              default:
+                return 0;
+            }
+          });
+          
+          // Re-append sorted projects
+          projects.forEach(project => projectsGrid.appendChild(project));
+        });
+      }
+      
+      // Update results count when filtering
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          setTimeout(() => {
+            const visibleProjects = projectsGrid.querySelectorAll('.project-card[style*="block"], .project-card:not([style*="none"])');
+            resultsCount.textContent = visibleProjects.length;
+          }, 100);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
